@@ -61,13 +61,17 @@ void showBSTree(BSTree t)
 		showBSTree(t->left);
 	}
 	//printf("Done recursing for now---------------\n");
-	printf("\n%s\n", t->value);
+	// Open the text file and write
+	// Do this every time to be safe, as this is recursion
+	FILE * fp = fopen ("invertedIndex.txt", "a+");
+	fprintf(fp, "%s\n------> ", t->value);
 	for (int i = 0; i < nElems(t->set); i++) {
 		//printf("THIS IS TEMP LOOP\n");
 		char * temp = retrieveVal(t->set, i);
-		printf("%s ", temp);
+		fprintf(fp, "%s ", temp);
 	}
-	printf("\n");
+	fprintf(fp, "\n\n");
+	fclose(fp);
 	if (t->right != NULL) {
 		//printf("Recursing left\n");
 		showBSTree(t->right);

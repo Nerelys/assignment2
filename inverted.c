@@ -22,6 +22,9 @@ void invertedIndex(void) {
 	showGraph(g, 1);
 
 	printf("About to show\n");
+	FILE * fp = fopen("invertedIndex.txt", "w");		// Erase existing
+	fclose(fp);
+
 	showBSTree(tree);
 	return;
 }
