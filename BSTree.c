@@ -16,9 +16,39 @@ typedef struct BSTNode {
 	Set set;
 } BSTNode;
 
+// Search the tree for terms, and output them in order
+void outputTree(BSTree t, char * term) {
+	// Recursively search the tree for a word term
+	// Then go through the set and display the url's
+	if (t == NULL) {
+		return;		// This is if the term doesn't exist
+	}
+	// If less alphabetical, go left
+	if (strcmp(term, t->value) < 0) {
+		return outputTree(t->left, term);
+	}
+	// If more alphabetical, go right
+	if (strcmp(term, t->value) > 0) {
+		return outputTree(t->right, term);
+	}
+
+	// If none, then we found the term!
+	// Print out the set inside
+	// (Don't worry, it should already be pagerank ordered!)
+	int i = nElems(t->set);
+
+	for (int k = 0; k < i; k++) {
+		char * val = retrieveVal(t->set, k);
+		float rank = retrieveRank(t->set, k);
+		printf("Testing output: %s and %.7f\n", val, rank);
+	}
+
+	return;
+}
+
 // make a new node containing a value
 static
-BSTLink newBSTNode(char * v, char * url)
+BSTLink newBSTNode(char * v, char * url, Set pagerankSet)
 {
 	//printf("Making new node\n");
 	BSTLink new = malloc(sizeof(BSTNode));
@@ -26,7 +56,9 @@ BSTLink newBSTNode(char * v, char * url)
 	new->value = strdup(v);
 	new->left = new->right = NULL;
 	new->set = newSet();
-	insertInto(new->set, url);
+	int i = nodeVal(pagerankSet, url);
+	float rank = retrieveRank(pagerankSet, i);
+	insertInto(new->set, url, rank);
 	return new;
 }
 
@@ -63,7 +95,7 @@ void showBSTree(BSTree t)
 	//printf("Done recursing for now---------------\n");
 	// Open the text file and write
 	// Do this every time to be safe, as this is recursion
-	FILE * fp = fopen ("invertedIndex.txt", "a+");
+	FILE * fp = fopen("invertedIndex.txt", "a");
 	fprintf(fp, "%s\n------> ", t->value);
 	for (int i = 0; i < nElems(t->set); i++) {
 		//printf("THIS IS TEMP LOOP\n");
@@ -170,25 +202,37 @@ int BSTreeNumLeaves(BSTree t)
 
 // insert a new value into a BSTree
 // altered to  work with strings!
-BSTree BSTreeInsert(BSTree t, char * v, char * url)
+BSTree BSTreeInsert(BSTree t, char * v, char * url, Set pagerankSet)
 {
 	//printf("Value %s and url %s\n", v, url);
 	if (t == NULL) {
 		//printf("At null\n");
-		return newBSTNode(v, url);
+		printf("New leaf\n");
+		return newBSTNode(v, url, pagerankSet);
 	}
+	//printf("As of inserting, v is %s and t->value is %s -> ", v, t->value);
 	//printf("For comparing %s and %s, strcmp says %d\n", v, t->value, strcmp(v, t->value));
 	if (strcmp(v, t->value) < 0) {
 		//printf("Less alphabetical\n");
-		t->left = BSTreeInsert(t->left, v, url);
+		t->left = BSTreeInsert(t->left, v, url, pagerankSet);
 	}
 	else if (strcmp(v, t->value) > 0) {
 		//printf("More alphabetical\n");
-		t->right = BSTreeInsert(t->right, v, url);
+		t->right = BSTreeInsert(t->right, v, url, pagerankSet);
 	}
 	else {
 		//printf("*********Equal value?\n");
-		insertInto(t->set, url);
+		int i = nodeVal(pagerankSet, url);
+		//printf("Received nodeVal of %d, and rank %f", i, retrieveRank(pagerankSet, i));
+		float rank;
+
+		if (i == -1)
+			rank = 0;
+		else
+			rank = retrieveRank(pagerankSet, i);
+
+		printf("Just before inserting %s have %f\n", v, rank);
+		insertInto(t->set, url, rank);
 		// Put it into the set of the node
 	}
 		/* don't insert duplicates */;
@@ -196,7 +240,7 @@ BSTree BSTreeInsert(BSTree t, char * v, char * url)
 }
 
 // check whether a value is in a BSTree
-int BSTreeFind(BSTree t, char * v)
+BSTree BSTreeFind(BSTree t, char * v)
 {
 	if (t == NULL)
 		return 0;
@@ -205,7 +249,7 @@ int BSTreeFind(BSTree t, char * v)
 	else if (strcmp(v, t->value) > 0)
 		return BSTreeFind(t->right, v);
 	else // (v == t->value)
-		return 1;
+		return t;
 }
 
 // delete root of tree

@@ -8,7 +8,22 @@
 #include "readData.h"
 #include "BSTree.h"
 
-BSTree readData (Set set, Graph g) {
+BSTree readData (Set set, Graph g, Set pagerankSet) {
+	// Telling us if we already have a working pagerank set
+	printf("THIS IS IMPORTANT ----------------------------> %d\n", nElems(pagerankSet));
+	int setFlag = 0;
+	if (nElems(pagerankSet) != 0)
+		setFlag = 1;
+
+	if (setFlag == 1) {
+		int elems = nElems(pagerankSet);
+		for (int i = 0; i < elems; i++) {
+			char * temp = retrieveVal(pagerankSet, i);
+			float rank = retrieveRank(pagerankSet, i);
+			printf("Testing to get %s and %f\n", temp, rank);
+		}
+	}
+
    FILE * fp;
 	//Graph g = newGraph(20);
 	Queue q = newQueue();
@@ -21,7 +36,7 @@ BSTree readData (Set set, Graph g) {
 	while (!feof(fp)) {				// The usual loop
 		fscanf(fp, "%s", word);		// Pop off queue as long as we have tasks
 		enterQueue(q, word);
-		showQueue(q);
+		//showQueue(q);
 	}
 	//printf("Temporary ending --------------------------\n");
 	//return EXIT_SUCCESS;
@@ -32,7 +47,8 @@ BSTree readData (Set set, Graph g) {
 		strcpy(url, vertex);
 		strcat(url, ".txt");
 		printf("Chosen url is %s\n", url);	// Now url has the '.txt'
-		fp = fopen(url, "r");
+		insertInto(set, vertex, 0);			// Insert this into the 'seen' set
+		fp = fopen(url, "r");				// early or it becomes a problem ;_;
 
 		while(!feof(fp)) {
 			printf("Scanning for section\n");
@@ -50,7 +66,7 @@ BSTree readData (Set set, Graph g) {
 					printf("%s\n", word);
 					if (strcmp(word, vertex) != 0) {
 						addEdge(g, vertex, word);
-						insertInto(set, word);
+						insertInto(set, word, 0);
 						//showBSTree(tree);
 						showGraph(g, 1);
 						printf("\n");
@@ -73,7 +89,14 @@ BSTree readData (Set set, Graph g) {
 				while (strcmp(word, "#end") != 0) {
 					//printf("%s ", word);
 					wordTrim(word);
-					tree = BSTreeInsert(tree, word, vertex);
+					//printf("Inserting %s with %s --------\n", word, vertex);
+					if (setFlag == 1) {
+						printf("___________________Inserting as flag 1\n");
+						tree = BSTreeInsert(tree, word, vertex, pagerankSet);
+					}
+					else
+						tree = BSTreeInsert(tree, word, vertex, set);
+					//tree = BSTreeInsert(tree, word, vertex, pagerankSet);
 					//showBSTree(tree);
 					fscanf(fp, "%s", word);
 				}

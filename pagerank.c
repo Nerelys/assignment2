@@ -11,94 +11,18 @@
 #include "set.h"
 #include "queue.h"
 #include "pagerank.h"
+#include "readData.h"
+#include "BSTree.h"
 
 // First and foremost I want to test if I can extract the data!
-void PageRank(float d, float diffPR, int maxIterations) {
+Set PageRank(float d, float diffPR, int maxIterations) {
 	printf("Running pagerank\n");
 
 	// All of this is to read the files and get a graph rep.
-	FILE * fp;
-	Graph g = newGraph(20);
-	Queue q = newQueue();
 	Set set = newSet();
-	//char set[20][20];
-	char word[100];			// For repeatedly reading words
-	char word2[100];			// For reading only 'section-1' or 'section-2'
-
-	fp = fopen("collection.txt", "r");
-	while (!feof(fp)) {				// The usual loop
-		fscanf(fp, "%s", word);		// Pop off queue as long as we have tasks
-		enterQueue(q, word);
-		showQueue(q);
-	}
-	//printf("Temporary ending --------------------------\n");
-	//return EXIT_SUCCESS;
-
-	while (!emptyQueue(q)) {
-		char * vertex = leaveQueue(q);	// Vertex is url without '.txt'
-		char url[20];							// Another array for the '.txt'
-		strcpy(url, vertex);
-		strcat(url, ".txt");
-		printf("Chosen url is %s\n", url);	// Now url has the '.txt'
-		fp = fopen(url, "r");
-
-		while(!feof(fp)) {
-			printf("Scanning for section\n");
-			fscanf(fp, "%s", word);
-			fscanf(fp, "%s", word2);
-
-			printf("Word 1: %s, and word 2: %s\n", word, word2);	// Figure out which section
-			if (strcmp(word, "Section-2") == 0) {
-				break;
-			}
-
-			if (strcmp(word, "#start") == 0 && strcmp(word2, "Section-1") == 0) {
-				fscanf(fp, "%s", word);
-				while (strcmp(word, "#end") != 0) {		// As long as we're in section 1
-					printf("%s\n", word);
-					if (strcmp(word, vertex) != 0) {
-						addEdge(g, vertex, word);
-						insertInto(set, word);
-						showGraph(g, 1);
-						printf("\n");
-					}
-					fscanf(fp, "%s", word);
-				}
-				fscanf(fp, "%s", word);
-				// Check for correct exit syntax
-				if (strcmp(word, "Section-1") != 0) {
-					fprintf(stderr, "Invalid exit situation: Require '#end Section-1'\n");
-					return;
-				}
-				printf("Exit section 1\n");
-			}
-
-			// Section-2 start
-			else if (strcmp(word, "#start") == 0 && strcmp(word2, "Section-2") == 0) {
-				fscanf(fp, "%s", word);
-				printf("\n");
-				while (strcmp(word, "#end") != 0) {
-					printf("%s ", word);
-					fscanf(fp, "%s", word);
-				}
-				printf("\n\n");
-				fscanf(fp, "%s", word);	// Scan for 'Section-2'
-				// Check for correct syntax
-				if (strcmp(word, "Section-2") != 0) {
-					fprintf(stderr, "Invalid exit situation: Require '#end Section-2'\n");
-					return;
-				}
-				printf("Exit section 2 with word %s\n", word);
-			}
-
-			else {
-				printf("Incorrect word: %s\n", word);
-				fprintf(stderr, "Invalid hook: Looking for '#start Section-x'\n");
-				return;
-			}
-		}
-		fclose(fp);
-	}
+	//BSTree tree = newBSTree();
+	Graph g = newGraph(20);
+	readData(set, g);
 	// At this point, the graph is fully built and all URL's are checked
 	// The task changes to getting the number of links to and from URL's,
 	// and then building the pagerank
@@ -121,7 +45,7 @@ void PageRank(float d, float diffPR, int maxIterations) {
 		if (outbound[i] == 0)
 			outbound[i] = 0.5;
 	}
-	for (int j = 0; j < elements; j++) 
+	for (int j = 0; j < elements; j++)
 		printf("Outbound for vert. %d is %f\n", j, outbound[j]);
 
 	// The counterpart to the outbound loop, this block fetches all INbound links for each URL
@@ -156,7 +80,7 @@ void PageRank(float d, float diffPR, int maxIterations) {
 		pageRank[i] = 1.0/elements;
 		//printf("		Pagerank[%d] = %f\n", i, pageRank[i]);
 	}
-	
+
 	//int maxIterations = 1000;
 	int iteration = 0;
 	float diff = diffPR;
@@ -240,17 +164,35 @@ void PageRank(float d, float diffPR, int maxIterations) {
 		char * url = retrieveVal(set, tracker[i]);
 		printf("Rank %d ---> %s, with rankValue %.7f\n", i+1, url, newPageRank[i]);
 	}
-}
 	
+	// Now create a final set with the pageranks in order!
+	Set rankSet = newSet();
+	for (int i = 0; i < elements; i++) {
+		char * val = retrieveVal(set, tracker[i]);
+		//float rank = retrieveRank(set, i);
+		insertInto(rankSet, val, newPageRank[i]);
+	}
+/*
+	for (int i = 0; i < elements; i++) {
+		char * val = retrieveVal(rankSet, i);
+		float rank = retrieveRank(rankSet, i);
+		//printf("Got %s and %.7f\n", val, rank);
+	}
+*/
+	disposeSet(set);
+
+	return rankSet;
+}
+
 // A function to compilate the W() value of a link
 // Elements is the size of the inbound/outbound array
 // Parse inbound[] or outbound[] for each task
 float WValue(Graph g, float * links, int src, int dest, Set set) {
 	float W = 0;
 	float ip1 = 0; float ip2 = 0;
-	char * srcVal; 
+	char * srcVal;
 	char * destVal;
-	
+
 	// We need the amount of outbound links of the target URL
 	// as well as all outbound links of all URL's connected to the source
 	// So we set ip1 to outbound[target], ezpz
@@ -266,7 +208,7 @@ float WValue(Graph g, float * links, int src, int dest, Set set) {
 		ip2 = ip2 + links[i];
 		//printf("ip2 update: %f\n", ip2);
 	}
-	
+
 	srcVal = retrieveVal(set, src);
 	destVal = retrieveVal(set, dest);
 	W = (ip1/(ip2));
