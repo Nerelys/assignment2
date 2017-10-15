@@ -4,7 +4,12 @@
 #define BSTREE_H
 
 typedef struct BSTNode *BSTree;
+#include "set.h"
 
+// Accumulate our search terms and amount of 'hits'
+void accumulateTerms(BSTree, char *, Set);
+// Output the set to stdout
+void outputTree(BSTree, char *);
 // create an empty BSTree
 BSTree newBSTree();
 // free memory associated with BSTree
@@ -29,9 +34,9 @@ int BSTreeNumNodes(BSTree);
 int BSTreeNumLeaves(BSTree);
 
 // insert a new value into a BSTree
-BSTree BSTreeInsert(BSTree, char *, char *);
+BSTree BSTreeInsert(BSTree, char *, char *, Set);
 // check whether a value is in a BSTree
-int BSTreeFind(BSTree, char *);
+BSTree BSTreeFind(BSTree, char *);
 // delete a value from a BSTree
 BSTree BSTreeDelete(BSTree, char *);
 

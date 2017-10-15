@@ -8,7 +8,24 @@
 #include "readData.h"
 #include "BSTree.h"
 
-BSTree readData (Set set, Graph g) {
+BSTree readData (Set set, Graph g, Set pagerankSet) {
+	// Telling us if we already have a working pagerank set
+	//printf("THIS IS IMPORTANT ----------------------------> %d\n", nElems(pagerankSet));
+	int setFlag = 0;
+	if (nElems(pagerankSet) != 0)
+		setFlag = 1;
+
+	/*
+	if (setFlag == 1) {
+		int elems = nElems(pagerankSet);
+		for (int i = 0; i < elems; i++) {
+			char * temp = retrieveVal(pagerankSet, i);
+			float rank = retrieveRank(pagerankSet, i);
+			//printf("Testing to get %s and %f\n", temp, rank);
+		}
+	}
+	*/
+
    FILE * fp;
 	//Graph g = newGraph(20);
 	Queue q = newQueue();
@@ -21,7 +38,7 @@ BSTree readData (Set set, Graph g) {
 	while (!feof(fp)) {				// The usual loop
 		fscanf(fp, "%s", word);		// Pop off queue as long as we have tasks
 		enterQueue(q, word);
-		showQueue(q);
+		//showQueue(q);
 	}
 	//printf("Temporary ending --------------------------\n");
 	//return EXIT_SUCCESS;
@@ -31,15 +48,16 @@ BSTree readData (Set set, Graph g) {
 		char url[20];							// Another array for the '.txt'
 		strcpy(url, vertex);
 		strcat(url, ".txt");
-		printf("Chosen url is %s\n", url);	// Now url has the '.txt'
-		fp = fopen(url, "r");
+		//printf("Chosen url is %s\n", url);	// Now url has the '.txt'
+		insertInto(set, vertex, 0);			// Insert this into the 'seen' set
+		fp = fopen(url, "r");				// early or it becomes a problem ;_;
 
 		while(!feof(fp)) {
-			printf("Scanning for section\n");
+			//printf("Scanning for section\n");
 			fscanf(fp, "%s", word);
 			fscanf(fp, "%s", word2);
 
-			printf("Word 1: %s, and word 2: %s\n", word, word2);	// Figure out which section
+			//printf("Word 1: %s, and word 2: %s\n", word, word2);	// Figure out which section
 			if (strcmp(word, "Section-2") == 0) {
 				break;
 			}
@@ -47,13 +65,13 @@ BSTree readData (Set set, Graph g) {
 			if (strcmp(word, "#start") == 0 && strcmp(word2, "Section-1") == 0) {
 				fscanf(fp, "%s", word);
 				while (strcmp(word, "#end") != 0) {		// As long as we're in section 1
-					printf("%s\n", word);
+					//printf("%s\n", word);
 					if (strcmp(word, vertex) != 0) {
 						addEdge(g, vertex, word);
-						insertInto(set, word);
+						insertInto(set, word, 0);
 						//showBSTree(tree);
-						showGraph(g, 1);
-						printf("\n");
+						//showGraph(g, 1);
+						//printf("\n");
 					}
 					fscanf(fp, "%s", word);
 				}
@@ -63,28 +81,35 @@ BSTree readData (Set set, Graph g) {
 					fprintf(stderr, "Invalid exit situation: Require '#end Section-1'\n");
 					//return EXIT_FAILURE;
 				}
-				printf("Exit section 1\n");
+				//printf("Exit section 1\n");
 			}
 
 			// Section-2 start
 			else if (strcmp(word, "#start") == 0 && strcmp(word2, "Section-2") == 0) {
 				fscanf(fp, "%s", word);
-				printf("\n");
+				//printf("\n");
 				while (strcmp(word, "#end") != 0) {
 					//printf("%s ", word);
 					wordTrim(word);
-					tree = BSTreeInsert(tree, word, vertex);
+					//printf("Inserting %s with %s --------\n", word, vertex);
+					if (setFlag == 1) {
+						//printf("___________________Inserting as flag 1\n");
+						tree = BSTreeInsert(tree, word, vertex, pagerankSet);
+					}
+					else
+						tree = BSTreeInsert(tree, word, vertex, set);
+					//tree = BSTreeInsert(tree, word, vertex, pagerankSet);
 					//showBSTree(tree);
 					fscanf(fp, "%s", word);
 				}
-				printf("\n\n");
+				//printf("\n\n");
 				fscanf(fp, "%s", word);	// Scan for 'Section-2'
 				// Check for correct syntax
 				if (strcmp(word, "Section-2") != 0) {
 					fprintf(stderr, "Invalid exit situation: Require '#end Section-2'\n");
 					//return EXIT_FAILURE;
 				}
-				printf("Exit section 2 with word %s\n", word);
+				//printf("Exit section 2 with word %s\n", word);
 			}
 
 			else {

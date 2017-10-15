@@ -11,5 +11,5 @@
 #include "BSTree.h"
 #include "queue.h"
 
-BSTree readData(Set set, Graph g);
+BSTree readData(Set, Graph, Set);
 char * wordTrim( char * word);

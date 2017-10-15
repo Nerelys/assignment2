@@ -11,7 +11,7 @@
 #include "BSTree.h"
 #include "readData.h"
 
-void invertedIndex(void) {
+BSTree invertedIndex() {
 	printf("Everything is working so far!\n");
 	Graph g = newGraph(20);
 	Set set = newSet();
@@ -26,5 +26,5 @@ void invertedIndex(void) {
 	fclose(fp);
 
 	showBSTree(tree);
-	return;
+	return tree;
 }
