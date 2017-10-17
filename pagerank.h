@@ -7,5 +7,5 @@
 #include "graph.h"
 #include "set.h"
 
-void PageRank(float d, float diffPR, int maxIterations);
+Set PageRank(float d, float diffPR, int maxIterations);
 float WValue(Graph g, float * links, int src, int dest, Set set);

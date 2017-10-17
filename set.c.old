@@ -38,35 +38,22 @@ static void disposeNode(Link);
 static int  findNode(Link,char *,Link *,Link *);
 
 // Take in a set and reorder from largest to least rank value
-int * orderSet(Set set, Set tallySet, int * tracker) {
-	int elems = nElems(tallySet);
+Set orderSet(Set set) {
+	int elems = nElems(set);
 	float sort[elems];
-	float tally[elems];
-	//int tracker[elems];
+	int tracker[elems];
 
 	for (int i = 0; i < elems; i++) {
-		//printf("%f\n", retrieveRank(set, i));
-		char * nodeCheck = retrieveVal(tallySet, i);
-		int node = nodeVal(set, nodeCheck);
-		sort[i] = retrieveRank(set, node);
-		//printf("set url is %s and tally url is %s\n", retrieveVal(set, node), retrieveVal(tallySet, i));
-		tally[i] = retrieveRank(tallySet, i);
+		printf("%f\n", retrieveRank(set, i));
+		sort[i] = retrieveRank(set, i);
 		tracker[i] = i;
 	}
-	//printf("/// \n");	
+	
 	int first = 1;
 	while (first < elems) {
-		for (int l = 0; l < nElems(tallySet); l++) {
-			//printf("-> %s\n", retrieveVal(tallySet, tracker[l]));
-		}
-		if ((tally[first] > tally[first - 1]) || (tally[first] == tally[first - 1] && sort[first] > sort[first - 1])){
-			float temp = tally[first];
-			//printf("\n    %f to %f\n", tally[first - 1], tally[first]);
-			//printf("and %f to %f\n", sort[first - 1], sort[first]);
-			tally[first] = tally[first - 1];
-			tally[first - 1] = temp;
-
-			temp = sort[first];
+		if (sort[first] > sort[first - 1]) {
+			float temp = sort[first];
+			printf("%f to %f\n", sort[first], sort[first - 1]);
 			sort[first] = sort[first - 1];
 			sort[first - 1] = temp;
 
@@ -77,20 +64,17 @@ int * orderSet(Set set, Set tallySet, int * tracker) {
 			first = 1;
 		}
 		else {
-			//printf("/\n");
 			first++;
 		}
 	}
-	/*
 	Set orderedSet = newSet();
 	for (int i = 0; i < elems; i++) {
-		printf("Value in pos. %d is %f %s\n", i, tally[i], retrieveVal(tallySet, i));
+		printf("Value in pos. %d is %f\n", i, sort[i]);
 		char * val = retrieveVal(set, tracker[i]);
-		insertInto(orderedSet, val, tally[i]);
+		insertInto(orderedSet, val, sort[i]);
 	}
-	*/
 
-	return tracker;
+	return orderedSet;
 }
 
 // A function to find the place of a string in the set
@@ -98,26 +82,26 @@ int nodeVal(Set set, char * val) {
 	//printf("Finding node val\n");
 	int i = 0;
 	int imax = nElems(set);
-	//printf("Elements %d\n", imax);
+	printf("Elements %d\n", imax);
 	//printf("Here ");
 	if (imax == 0)
 		return -1;
 	char * temp = retrieveVal(set, i);
-	//printf("	%s to be compared with %s\n", val, temp);
+	printf("	%s to be compared with %s\n", val, temp);
 	//printf(" and now here\n");
 
 	while ((strcmp(temp, val) != 0) && (i < imax - 1)) {
 		//printf("Iterated\n");
 		i++;
-		//printf("I is now %d\n", i);
+		printf("I is now %d\n", i);
 		temp = retrieveVal(set, i);
-		//printf("	Comparing with %s\n", temp);
+		printf("	Comparing with %s\n", temp);
 	}
 
 	if (strcmp(temp, val) == 0)
 		return i;
 
-	//printf("Not found\n");
+	printf("Not found\n");
 	return -1;
 	
 }

@@ -8,11 +8,21 @@
 #include "pagerank.h"
 #include "graph.h"
 #include "queue.h"
+#include "inverted.h"
 
 int main (int argc, char ** argv) {
 	
-	// Call pageRank, which I've made a void return
-	PageRank(0.85, 0.00001, 1000);
+	// Call pageRank, which returns a set of ordered pageranks
+	Set set = PageRank(0.85, 0.00001, 1000);
+	printf("\n");
+	for (int i = 0; i < nElems(set); i++) {
+		char * val = retrieveVal(set, i);
+		float rank = retrieveRank(set, i);
+		printf("Outside pagerank: %s and %.7f\n", val, rank);
+	}
+
+	// Call invertedIndex, to get a gist of where the words are
+	//invertedIndex();
 
 	return EXIT_SUCCESS;
 }

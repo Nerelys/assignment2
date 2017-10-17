@@ -8,10 +8,14 @@ typedef struct SetRep *Set;
 
 // Function signatures
 
+int * orderSet(Set, Set, int *);
+void incrementRank(Set, int);
+int nodeVal(Set, char *);
+float retrieveRank(Set, int);
 char * retrieveVal(Set, int);
 Set newSet();
 void disposeSet(Set);
-void insertInto(Set,char *);
+void insertInto(Set, char *, float);
 void dropFrom(Set,char *);
 int  isElem(Set,char *);
 int  nElems(Set);

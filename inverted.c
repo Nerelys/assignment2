@@ -11,20 +11,23 @@
 #include "BSTree.h"
 #include "readData.h"
 
-void invertedIndex(void) {
+BSTree invertedIndex() {
 	printf("Everything is working so far!\n");
 	Graph g = newGraph(20);
 	Set set = newSet();
 	BSTree tree = newBSTree();
-
-	tree = readData(set, g);
+	
+	Set temp = set;
+	tree = readData(set, g, temp);
 
 	showGraph(g, 1);
 
 	printf("About to show\n");
 	FILE * fp = fopen("invertedIndex.txt", "w");		// Erase existing
+	fprintf(fp, "#URLNUM %d #ENDURLNUM\n", nVertices(g));
 	fclose(fp);
 
 	showBSTree(tree);
-	return;
+	return tree;
+	//return;
 }
