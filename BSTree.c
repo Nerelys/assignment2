@@ -16,10 +16,11 @@ char * value;
 	Set set;
 } BSTNode;
 
-void accumulateTerms(BSTree t, char * term, Set tallySet) {
+void accumulateTerms(char * term, Set tallySet) {
 	// Find all search terms and add the respective URL's to a list?
 	// And do something to count the amount of times they appear
 	// This code will look very similar to outputTree()
+	/*
 	if (t == NULL) {
 		return;
 	}
@@ -29,54 +30,69 @@ void accumulateTerms(BSTree t, char * term, Set tallySet) {
 	if (strcmp(term, t->value) > 0) {
 		return accumulateTerms(t->right, term, tallySet);
 	}
+	*/ // Changed to work with invertedIndex.txt
 
-	// Now if we haven't tripped the other cases,
-	// then we have found the right value!
-	int i = nElems(t->set);
-	//printf("Length of found set = %d\n", i);
+	FILE * invertedfp = fopen("invertedIndex.txt", "r");
+	if (invertedfp == NULL)
+		fprintf(stderr, "Error: invertedIndex.txt does not exist\n");
 
-	for (int k = 0; k < i; k++) {
-		//printf("To find set[%d]\n", k);
-		char * val = retrieveVal(t->set, k);
-		//printf("Value gotten is %s\n", val);
-		//printf("This is the nasty step\n");
+	char temp[100];
+	char buffer[1000];
+	fscanf(invertedfp, "%s", temp);
+	while (strcmp(temp, term) != 0) {
+		fscanf(invertedfp, "%s", temp);
+		//printf("%s\n", temp);
+	}
 
-		if (!isElem(tallySet, val)) {
-			//printf("Not found\n");
-			insertInto(tallySet, val, 1.0);
+	int length = sizeof(buffer);
+
+	// Move the file pointer forward by one to
+	// counter the sneaky space
+	// Trust me, it's necessary for what's going on here
+	fseek(invertedfp, 1, SEEK_CUR);
+
+	// Use fgets to get the whole line because it's easy and nice
+	fgets(buffer, length, invertedfp);
+	char buff = buffer[0];
+	int pos = 0;
+	//printf("Start\n");
+
+	// Within the inner loop, start making a string for the url
+	// so that we can parse it in and get tf at the same time!
+
+	char dest[50];		// 50 seems bit enough for a url, right?
+	int destpos = 0;
+
+	// So I read the spec, and I don't actually need to parse in
+	// per URL, so that's a thing...
+	// I removed dest and destpos accordigly
+	while (buff != '\n') {
+		//printf("Outer loop\n");
+		while (buff != ' ') {
+			//printf("Inner loop %c\n", buff);
+			dest[destpos] = buff;
+			destpos++;
+			pos++;
+			buff = buffer[pos];
 		}
+		dest[destpos] = '\0';
+		//printf("To test if string conversion worked %s\n", dest);
 
+		if (!isElem(tallySet, dest))
+			insertInto(tallySet, dest, 1.0);
 		else {
-			int place = nodeVal(tallySet, val);
-			//printf("Found at place %d in tallySet\n", place);
-
+			int place = nodeVal(tallySet, dest);
 			// If not yet in the tally, place it in with count 1
 			// Else replace by iterating the value
 			int count = retrieveRank(tallySet, place);
-			//printf("%d, incrementing %s\n", count, val);
-			
 			incrementRank(tallySet, place);
-	
-			//printf("Just after dropping\n");
-			//
-			/*
-			for (int l = 0; l < nElems(tallySet); l++) {
-				char * talVal = retrieveVal(tallySet, l);
-				float abc = retrieveRank(tallySet, l);
-				//printf("	-> tally[%d] = %s with tally %f\n", l, talVal, abc);
-			}
-			*/
-			insertInto(tallySet, val, count + 1);
+			insertInto(tallySet, dest, count + 1);
 		}
-		
-		//int elems = nElems(tallySet);
-		/*
-		for (int elemCount = 0; elemCount < elems; elemCount++) {
-			char * talVal = retrieveVal(tallySet, elemCount);
-			float abc = retrieveRank(tallySet, elemCount);
-			//printf("	--> tally[%d] = %s with tally %f\n", elemCount, talVal, abc);
-		}
-		*/
+
+		destpos = 0;
+		//urlCount++;
+		pos++;
+		buff = buffer[pos];
 	}
 
 	return;

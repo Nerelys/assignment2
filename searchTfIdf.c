@@ -10,7 +10,7 @@
 #include <string.h>
 
 #include "searchTfIdf.h"
-#include "tfidf.h"	// TODO create this file
+#include "tfidf.h"	
 
 int main(int argc, char ** argv) {
 	// In order to get the term frequency, we need to tally the amount of
@@ -46,15 +46,16 @@ int main(int argc, char ** argv) {
 
 	Set tfidfSet = newSet();
 	int elems = nElems(tallySet);
+	int vertices = nVertices(g);
 
 	for (int i = 0; i < elems; i++) {
 		double loopCount = 0;
 		char * page = retrieveVal(tallySet, i);
-		printf("For page %s: ", page);
+		//printf("For page %s: ", page);
 		for (int j = 1; j < argc; j++) {
-			loopCount = loopCount + (getIdf(argv[j]) * getTf(page, argv[j]));
+			loopCount = loopCount + (getIdf(argv[j], vertices) * getTf(page, argv[j]));
 		}
-		printf("\nFinal tfidf is %lf\n", loopCount);
+		//printf("\nFinal tfidf is %lf\n", loopCount);
 		insertInto(tfidfSet, page, loopCount);
 	}
 	
@@ -64,15 +65,15 @@ int main(int argc, char ** argv) {
 
 	orderSet(tfidfSet, tallySet, tracker);
 
-	printf("\nFinal tfidf rank results:\n");
+	//printf("\nFinal tfidf rank results:\n");
 
 	for (int k = 0; k < elems; k++) {
 		char * temp = retrieveVal(tallySet, tracker[k]);
 		double count = retrieveRank(tfidfSet, k);
-		float rank = retrieveRank(tallySet, tracker[k]);
-		printf("%s with rank %.7f and tfidf %.6f\n", temp, rank, count);
+		//float rank = retrieveRank(tallySet, tracker[k]);
+		printf("%s %.6f\n", temp, count);
 	}
 
-	printf("All done!\n");
+	//printf("All done!\n");
 	return EXIT_SUCCESS;
 }

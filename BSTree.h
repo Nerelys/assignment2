@@ -7,7 +7,7 @@ typedef struct BSTNode *BSTree;
 #include "set.h"
 
 // Accumulate our search terms and amount of 'hits'
-void accumulateTerms(BSTree, char *, Set);
+void accumulateTerms(char *, Set);
 // Output the set to stdout
 void outputTree(BSTree, char *);
 // create an empty BSTree

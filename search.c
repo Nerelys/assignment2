@@ -5,20 +5,22 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "pagerank.h"
+#include "pagerankFunc.h"
 #include "graph.h"
 #include "queue.h"
-#include "inverted.h"
+#include "invertedFunc.h"
 
 int main (int argc, char ** argv) {
 	
+	if (argc < 2) {
+		fprintf(stderr, "Usage: %s searchTerm...\n", argv[0]);
+		return EXIT_FAILURE;
+	}
 	// Call pageRank, which returns a set of ordered pageranks
-	Set set = PageRank(0.85, 0.00001, 1000);
-	printf("\n");
+	// Set set = PageRank(0.85, 0.00001, 1000);
 	for (int i = 0; i < nElems(set); i++) {
 		char * val = retrieveVal(set, i);
-		float rank = retrieveRank(set, i);
-		printf("Outside pagerank: %s and %.7f\n", val, rank);
+		printf("%s\n", val);
 	}
 
 	// Call invertedIndex, to get a gist of where the words are

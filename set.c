@@ -56,10 +56,13 @@ int * orderSet(Set set, Set tallySet, int * tracker) {
 	//printf("/// \n");	
 	int first = 1;
 	while (first < elems) {
-		for (int l = 0; l < nElems(tallySet); l++) {
-			//printf("-> %s\n", retrieveVal(tallySet, tracker[l]));
-		}
 		if ((tally[first] > tally[first - 1]) || (tally[first] == tally[first - 1] && sort[first] > sort[first - 1])){
+			/*
+			for (int l = 0; l < nElems(tallySet); l++) {
+				printf("-> %s   %.7f\n", retrieveVal(tallySet, tracker[l]), retrieveRank(set, l));
+			}
+			*/
+			//printf("------\n");
 			float temp = tally[first];
 			//printf("\n    %f to %f\n", tally[first - 1], tally[first]);
 			//printf("and %f to %f\n", sort[first - 1], sort[first]);
@@ -69,11 +72,14 @@ int * orderSet(Set set, Set tallySet, int * tracker) {
 			temp = sort[first];
 			sort[first] = sort[first - 1];
 			sort[first - 1] = temp;
-
+			//printf("Swapping in tracker %d and %d\n", tracker[first], tracker[first - 1]);
 			int temp2 = tracker[first];
 			tracker[first] = tracker[first - 1];
 			tracker[first - 1] = temp2;
-
+			/*
+			for (int l = 0; l < nElems(tallySet); l++) {
+				//printf("-> %s\n", retrieveVal(tallySet, tracker[l]));
+			} */
 			first = 1;
 		}
 		else {
@@ -254,8 +260,18 @@ void dropFrom(Set s, char *str)
 	int found = findNode(s->elems,str,&curr,&prev);
 	if (!found) return;
 	s->nelems--;
-	if (prev == NULL)
+	curr = s->elems;
+	prev = NULL;
+	//printf("It is %s\n", curr->val);
+	while (strcmp(curr->val, str) != 0) {
+		prev = curr;
+		curr = curr->next;
+	}
+
+	if (prev == NULL) {
+		//printf("Prev is NULL\n");
 		s->elems = curr->next;
+	}
 	else
 		prev->next = curr->next;
 	disposeNode(curr);
