@@ -21,6 +21,6 @@ int main (int argc, char ** argv) {
 
 	PageRank(atof(argv[1]), atof(argv[2]), atoi(argv[3]));
 
-	printf("Job's done!\n");
+	printf("Successfully wrote to pagerankList.txt\n");
 	return EXIT_SUCCESS;
 }

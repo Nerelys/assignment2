@@ -63,10 +63,12 @@ int main(int argc, char ** argv) {
 	// Try to accumulate terms
 	// This cycles through all of our search terms
 	// and gradually adds them to a set that tallies our results
+	char argTemp[50];
 	for (int i = 1; i < argc; i++) {
-		char * temp = argv[i];
+		strcpy(argTemp, argv[i]);
+		wordTrim(argTemp);
 		//printf("Accumulating for %s\n", temp);
-		accumulateTerms(temp, tallySet);
+		accumulateTerms(argTemp, tallySet);
 	}
 
 	/*

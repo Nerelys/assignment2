@@ -33,19 +33,27 @@ void accumulateTerms(char * term, Set tallySet) {
 	*/ // Changed to work with invertedIndex.txt
 
 	FILE * invertedfp = fopen("invertedIndex.txt", "r");
-	if (invertedfp == NULL)
+	if (invertedfp == NULL) {
 		fprintf(stderr, "Error: invertedIndex.txt does not exist\n");
+		exit(0);
+	}
 
 	char temp[100];
 	char buffer[1000];
 	fscanf(invertedfp, "%s", temp);
-	while (strcmp(temp, term) != 0) {
+	//printf("Searching for %s\n", term);
+	while (strcmp(temp, term) != 0 && !feof(invertedfp)) {
 		fscanf(invertedfp, "%s", temp);
 		//printf("%s\n", temp);
+	}
+	if (feof(invertedfp)) {
+		fclose(invertedfp);
+		return;
 	}
 
 	int length = sizeof(buffer);
 
+	//printf("Here A\n");
 	// Move the file pointer forward by one to
 	// counter the sneaky space
 	// Trust me, it's necessary for what's going on here
@@ -66,6 +74,7 @@ void accumulateTerms(char * term, Set tallySet) {
 	// So I read the spec, and I don't actually need to parse in
 	// per URL, so that's a thing...
 	// I removed dest and destpos accordigly
+	//printf("Here B\n");
 	while (buff != '\n') {
 		//printf("Outer loop\n");
 		while (buff != ' ') {
@@ -78,9 +87,12 @@ void accumulateTerms(char * term, Set tallySet) {
 		dest[destpos] = '\0';
 		//printf("To test if string conversion worked %s\n", dest);
 
-		if (!isElem(tallySet, dest))
+		if (!isElem(tallySet, dest)) {
+			//printf("Not an element\n");
 			insertInto(tallySet, dest, 1.0);
+		}
 		else {
+			//printf("Element\n");
 			int place = nodeVal(tallySet, dest);
 			// If not yet in the tally, place it in with count 1
 			// Else replace by iterating the value
@@ -94,7 +106,7 @@ void accumulateTerms(char * term, Set tallySet) {
 		pos++;
 		buff = buffer[pos];
 	}
-
+	//printf("left\n");
 	return;
 }
 

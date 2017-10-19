@@ -35,9 +35,14 @@ FILE * fp = fopen("invertedIndex.txt", "r");
 	*/
 	// Now we have the total number of files, find the IDF
 	fscanf(fp, "%s", temp);
-	while (strcmp(temp, word) != 0) {
+	while (strcmp(temp, word) != 0 && !feof(fp)) {
 		fscanf(fp, "%s", temp);
 		//printf("%s\n", temp);
+	}
+	if (feof(fp)) {
+		fclose(fp);
+		//printf("Left early\n");
+		return 0;
 	}
 
 	// Now read the rest of the line (which contains the URL's)
@@ -126,14 +131,22 @@ double getTf(char * file, char * word) {
 	fscanf(filePointer, "%s", tempWord);
 
 	// First find beginning of 'word' section
-	while (strcmp(tempWord, "Section-2") != 0) 
+	while (strcmp(tempWord, "Section-2") != 0 && !feof(filePointer)) {
+		//printf("Word is %s\n", tempWord);
 		fscanf(filePointer, "%s", tempWord);
+	}
 
+	if (feof(filePointer)) {
+		//printf("left early\n");
+		fclose(filePointer);
+		return 0;
+	}
 	// Now scan the words
 	// MAKE SURE TO TRIM THEM
 	// ie. normalise them
 	// Or else they won't register and it'll screw up the data
-
+	//printf("Haven't left early!\n");
+	//printf("***	I'm searching for %s\n", word);
 	while(strcmp(tempWord, "#end") != 0) {
 		char * normalised = wordTrim(tempWord);
 		if(strcmp(normalised, word) == 0) 
@@ -149,5 +162,6 @@ double getTf(char * file, char * word) {
 
 	// As always, clean up after ourselves!
 	fclose(filePointer);
+	//printf("returning %f\n", tf);
 	return tf;
 }
