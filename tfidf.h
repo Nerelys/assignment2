@@ -4,5 +4,5 @@
 
 #include "readData.h"
 
-double getIdf(char *);
+double getIdf(char *, int);
 double getTf(char *, char *);

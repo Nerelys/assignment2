@@ -5,29 +5,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "inverted.h"
+#include "invertedFunc.h"
 #include "graph.h"
 #include "set.h"
 #include "BSTree.h"
 #include "readData.h"
 
-BSTree invertedIndex() {
-	printf("Everything is working so far!\n");
-	Graph g = newGraph(20);
-	Set set = newSet();
-	BSTree tree = newBSTree();
-	
-	Set temp = set;
-	tree = readData(set, g, temp);
+int main(int argc, char ** argv) {
+	printf("Compiling inverted Index...\n\n");
+	invertedIndex();
 
-	showGraph(g, 1);
-
-	printf("About to show\n");
-	FILE * fp = fopen("invertedIndex.txt", "w");		// Erase existing
-	fprintf(fp, "#URLNUM %d #ENDURLNUM\n", nVertices(g));
-	fclose(fp);
-
-	showBSTree(tree);
-	return tree;
-	//return;
+	printf("Jobs done!\n");
+	return EXIT_SUCCESS;
 }

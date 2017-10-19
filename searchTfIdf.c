@@ -10,7 +10,7 @@
 #include <string.h>
 
 #include "searchTfIdf.h"
-#include "tfidf.h"	// TODO create this file
+#include "tfidf.h"	
 
 int main(int argc, char ** argv) {
 	// In order to get the term frequency, we need to tally the amount of
@@ -24,13 +24,20 @@ int main(int argc, char ** argv) {
 		return EXIT_FAILURE;
 	}
 
-	invertedIndex();
-	// These function are for accumulateTerms()
-	Set s = newSet();
-	Set trashSet = newSet();
-	Graph g = newGraph(20);
-	BSTree tree = readData(s, g, trashSet);
+	FILE * collectionfp = fopen("collection.txt", "r");
+	if (collectionfp == NULL) {
+		fprintf(stderr, "Error: collection.txt not found! Are you in the right directory?\n");
+		return EXIT_FAILURE;
+	}
 
+	int vertices = 0;
+	char collWord[50];
+	fscanf(collectionfp, "%s", collWord);
+	while (!feof(collectionfp)) {
+		vertices++;
+		fscanf(collectionfp, "%s", collWord);
+	}
+	//printf("%d URLs found\n", vertices);
 	// Do invertedIndex first as we need invertedIndex.txt to
 	// reference and get the tf-idf
 
@@ -39,22 +46,30 @@ int main(int argc, char ** argv) {
 
 	Set tallySet = newSet();
 
+	char argTemp[50];
 	for (int i = 1; i < argc; i++) {
-		char * temp = argv[i];
-		accumulateTerms(tree, temp, tallySet);
+		strcpy(argTemp, argv[i]);
+		wordTrim(argTemp);
+		//printf("%s\n", argTemp);
+		//printf("Accumulating for %s\n", temp);
+		accumulateTerms(argTemp, tallySet);
 	}
 
 	Set tfidfSet = newSet();
 	int elems = nElems(tallySet);
+	//int vertices = nVertices(g);
 
 	for (int i = 0; i < elems; i++) {
 		double loopCount = 0;
 		char * page = retrieveVal(tallySet, i);
-		printf("For page %s: ", page);
-		for (int j = 1; j < argc; j++) {
-			loopCount = loopCount + (getIdf(argv[j]) * getTf(page, argv[j]));
+		//printf("For page %s: ", page);
+		for (int j = 1; j < nElems(tallySet) + 1; j++) {
+			//printf("**\nFor %s\n", argv[j]);
+			//printf("It's %s\n", retrieveVal(tallySet, j));
+			loopCount = loopCount + (getIdf(wordTrim(argv[j]), vertices) * getTf(page, wordTrim(argv[j])));
+			//printf("%f\n", loopCount);
 		}
-		printf("\nFinal tfidf is %lf\n", loopCount);
+		//printf("\nFinal tfidf is %lf\n", loopCount);
 		insertInto(tfidfSet, page, loopCount);
 	}
 	
@@ -64,15 +79,15 @@ int main(int argc, char ** argv) {
 
 	orderSet(tfidfSet, tallySet, tracker);
 
-	printf("\nFinal tfidf rank results:\n");
+	//printf("\nFinal tfidf rank results:\n");
 
 	for (int k = 0; k < elems; k++) {
 		char * temp = retrieveVal(tallySet, tracker[k]);
-		double count = retrieveRank(tfidfSet, k);
+		double count = retrieveRank(tfidfSet, nodeVal(tfidfSet, temp));
 		float rank = retrieveRank(tallySet, tracker[k]);
-		printf("%s with rank %.7f and tfidf %.6f\n", temp, rank, count);
+		printf("%s %.0f %.6f\n", temp, rank, count);
 	}
 
-	printf("All done!\n");
+	//printf("All done!\n");
 	return EXIT_SUCCESS;
 }

@@ -10,6 +10,7 @@
 
 // Only include pagerankSet if we need to put in order of pagerank
 // Really only for use in searchPagerank
+// It's a little hacky, yes, but by golly IT WORKS!
 BSTree readData (Set set, Graph g, Set pagerankSet) {
 	// Telling us if we already have a working pagerank set
 	//printf("THIS IS IMPORTANT ----------------------------> %d\n", nElems(pagerankSet));

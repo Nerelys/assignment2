@@ -10,16 +10,16 @@
 
 #include "tfidf.h"
 
-double getIdf(char * word) {
+double getIdf(char * word, int vertices) {
 
 FILE * fp = fopen("invertedIndex.txt", "r");
 
 	// Get our total number of URL's from the file header
 	char temp[100];
-	fscanf(fp, "%s", temp);
-	double urlNum;
+	//fscanf(fp, "%s", temp);
+	int urlNum = vertices;
 	// Quick bit of code to read the header
-	if (strcmp(temp, "#URLNUM") == 0) {
+	/*if (strcmp(temp, "#URLNUM") == 0) {
 		//int urlNum[1];
 		fscanf(fp, "%lf", &urlNum);
 		fscanf(fp, "%s", temp);
@@ -32,18 +32,24 @@ FILE * fp = fopen("invertedIndex.txt", "r");
 		fprintf(stderr, "Invalid header!\n");
 		return EXIT_FAILURE;
 	}
+	*/
 	// Now we have the total number of files, find the IDF
 	fscanf(fp, "%s", temp);
-	while (strcmp(temp, word) != 0) {
+	while (strcmp(temp, word) != 0 && !feof(fp)) {
 		fscanf(fp, "%s", temp);
 		//printf("%s\n", temp);
+	}
+	if (feof(fp)) {
+		fclose(fp);
+		//printf("Left early\n");
+		return 0;
 	}
 
 	// Now read the rest of the line (which contains the URL's)
 	//char newlineChar[1];
 	//newlineChar[0] = ' ';
 	char buffer[1000];
-	double urlCount = -1;
+	double urlCount = 0;
 	int length = sizeof(buffer);
 
 	// Move the file pointer forward by one to
@@ -93,8 +99,8 @@ FILE * fp = fopen("invertedIndex.txt", "r");
 	//printf("input for log is %lf\n", idf);
 	idf = log10(idf);
 	//printf("now %lf\n", idf);
-	//printf("urlNum is %lf and urlcount is %lf\n", urlNum, urlCount);
-	printf("Term IDF for %s is %lf\n", word, idf);
+	//printf("urlNum is %d and urlcount is %lf\n", urlNum, urlCount);
+	//printf("Term IDF for %s is %lf\n", word, idf);
 	// Close our file, no littering
 	fclose(fp);
 
@@ -125,15 +131,23 @@ double getTf(char * file, char * word) {
 	fscanf(filePointer, "%s", tempWord);
 
 	// First find beginning of 'word' section
-	while (strcmp(tempWord, "Section-2") != 0) 
+	while (strcmp(tempWord, "Section-2") != 0 && !feof(filePointer)) {
+		//printf("Word is %s\n", tempWord);
 		fscanf(filePointer, "%s", tempWord);
+	}
 
+	if (feof(filePointer)) {
+		//printf("left early\n");
+		fclose(filePointer);
+		return 0;
+	}
 	// Now scan the words
 	// MAKE SURE TO TRIM THEM
 	// ie. normalise them
 	// Or else they won't register and it'll screw up the data
-
-	while(!feof(filePointer)) {
+	//printf("Haven't left early!\n");
+	//printf("***	I'm searching for %s\n", word);
+	while(strcmp(tempWord, "#end") != 0) {
 		char * normalised = wordTrim(tempWord);
 		if(strcmp(normalised, word) == 0) 
 			count++;
@@ -141,11 +155,13 @@ double getTf(char * file, char * word) {
 		fscanf(filePointer, "%s", tempWord);
 	}
 
+	wordCount = wordCount - 1;
 	double tf = (count/wordCount);
-	printf("Total number of words in %s is %lf\n", file, wordCount);
-	printf("Terms found = %lf, tf = %lf\n", count, tf);
+	//printf("Total number of words in %s is %lf\n", file, wordCount);
+	//printf("Terms found = %lf, tf = %lf\n", count, tf);
 
 	// As always, clean up after ourselves!
 	fclose(filePointer);
+	//printf("returning %f\n", tf);
 	return tf;
 }

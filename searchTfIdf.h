@@ -2,7 +2,7 @@
 // Created 17/10/17
 // Last edited: 17/10/17
 
-#include "inverted.h"
+#include "invertedFunc.h"
 #include "set.h"
 #include "graph.h"
 #include "BSTree.h"
