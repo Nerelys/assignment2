@@ -53,19 +53,25 @@ int main(int argc, char ** argv) {
 		//printf("%s\n", argTemp);
 		//printf("Accumulating for %s\n", temp);
 		accumulateTerms(argTemp, tallySet);
+		//printf("Testing preserve: %s\n", argv[i]);
+		//printf("Tallyset has %d elements\n", nElems(tallySet));
 	}
 
 	Set tfidfSet = newSet();
 	int elems = nElems(tallySet);
 	//int vertices = nVertices(g);
+	//printf("argument is %s\n", argv[1]);
 
 	for (int i = 0; i < elems; i++) {
 		double loopCount = 0;
 		char * page = retrieveVal(tallySet, i);
 		//printf("For page %s: ", page);
-		for (int j = 1; j < nElems(tallySet) + 1; j++) {
+		for (int j = 1; j < argc; j++) {
 			//printf("**\nFor %s\n", argv[j]);
 			//printf("It's %s\n", retrieveVal(tallySet, j));
+			//printf("In loop -> ");
+			//printf("Hard Argument is %s\n", argv[1]);
+			//printf("Argument is %s\n", argv[j]);
 			loopCount = loopCount + (getIdf(wordTrim(argv[j]), vertices) * getTf(page, wordTrim(argv[j])));
 			//printf("%f\n", loopCount);
 		}
@@ -84,8 +90,8 @@ int main(int argc, char ** argv) {
 	for (int k = 0; k < elems; k++) {
 		char * temp = retrieveVal(tallySet, tracker[k]);
 		double count = retrieveRank(tfidfSet, nodeVal(tfidfSet, temp));
-		float rank = retrieveRank(tallySet, tracker[k]);
-		printf("%s %.0f %.6f\n", temp, rank, count);
+		//float rank = retrieveRank(tallySet, tracker[k]);
+		printf("%s %.6f\n", temp, count);
 	}
 
 	//printf("All done!\n");

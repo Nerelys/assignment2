@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -Werror -g
+CFLAGS=-Wall -g -lm -std=c11
 LIBS= graph.o set.o BSTree.o queue.o invertedFunc.o pagerankFunc.o readData.o tfidf.o -lm
 
 searchPagerank: searchPagerank.o $(LIBS)
@@ -13,6 +13,9 @@ inverted: inverted.o $(LIBS)
 
 searchTfIdf: searchTfIdf.o $(LIBS)
 	$(CC) -o searchTfIdf searchTfIdf.o $(LIBS)
+
+scaled: scaledFootrule.o $(LIBS)
+	$(CC) -o scaledFootrule scaledFootrule.o $(LIBS)
 
 clean: 
 	rm -f *.o
