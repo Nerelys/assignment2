@@ -128,6 +128,7 @@ BSTree readData (Set set, Graph g, Set pagerankSet) {
 }
 
 char * wordTrim(char * word) {
+	//printf("Word to be trimmed: %s\n", word);
 	int len = strlen(word);
 
 	for (int i = 0; i < len; i++) {

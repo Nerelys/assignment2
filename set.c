@@ -1,5 +1,6 @@
 // set.c ... simple, inefficient Set of Strings
 // Written by John Shepherd, September 2015
+// DISCLAIMER: This code is mainly lecture code with select additions!
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -36,6 +37,40 @@ int  nElems(Set);
 static Link newNode(char *, float);
 static void disposeNode(Link);
 static int  findNode(Link,char *,Link *,Link *);
+
+/*
+// Add to an alphabetical set
+addToAlpha(Set s, Link link) {
+	if (s == NULL)
+		return;
+	if (link == NULL)
+		return;
+
+	if (s->elems == NULL) {
+		s->elems = link;
+		return;
+	}
+
+	if (strLT(link->val, s->elems)) {
+		link->next = s->elems;
+		s->elems = link;
+		return;
+	}
+
+	if (isElem(s, link))
+		return;
+
+	Link curr = s->elems;
+	Link next = curr->next;
+	while (next != NULL && strLT(next->val, link->val)) {
+		curr = next;
+		next = curr->next;
+	}
+	curr->next = link;
+	link->next = next;
+	return;
+}
+*/
 
 // Take in a set and reorder from largest to least rank value
 int * orderSet(Set set, Set tallySet, int * tracker) {
@@ -306,7 +341,7 @@ void showSet(Set s)
 		int id = 0;
 		curr = s->elems;
 		while (curr != NULL) {
-			printf("[%03d] %s\n", id, curr->val);
+			printf("[%03d] %s and %.0f\n", id, curr->val, curr->rank);
 			id++;
 			curr = curr->next;
 		}

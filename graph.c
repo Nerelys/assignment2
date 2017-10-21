@@ -1,5 +1,6 @@
 // graph.c ... Graph of strings (adjacency matrix)
 // Written by John Shepherd, September 2015
+// DISCLAIMER: This code is mainly lecture code with select additions!
 
 #include <stdlib.h>
 #include <stdio.h>

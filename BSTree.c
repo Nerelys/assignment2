@@ -1,4 +1,5 @@
 // BSTree.c ... implementation of binary search tree ADT
+// DISCLAIMER: This code is mainly lecture code with select additions!
 
 #include <stdlib.h>
 #include <stdio.h>

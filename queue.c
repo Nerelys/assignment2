@@ -1,5 +1,6 @@
 // queue.c ... simple Queue of Strings
 // Written by John Shepherd, September 2015
+// DISCLAIMER: This code is mainly lecture code with select additions!
 
 #include <stdlib.h>
 #include <stdio.h>
